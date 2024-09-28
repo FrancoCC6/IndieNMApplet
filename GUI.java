@@ -3,21 +3,31 @@ import java.awt.*
 import javax.swing.*
 
 public class GUI {
-	private JFrame frame;
-	private LayoutManager frame_layout = new BorderLayout();
-	private String title = "Conectarse a una red";
+    private static final JFrame FRAME;
+    private static final LayoutManager FRAME_LAYOUT = new BorderLayout();
+    private static final String TITLE = "Conectarse a una red";
+    public static final int
+        FRAME_ANCHO = 300,
+        FRAME_ALTO = 200;
 
-	public static void createFrame() {
-		frame = new JFrame(title);
-		frame.setLayout(frame_layout);
+    public static void createFrame() {
+        FRAME = new JFrame(TITLE);
+        FRAME
+            .setLayout (FRAME_LAYOUT);
 
-		// Inicializar componentes
-		frame.add(Componentes.PANEL_SUPERIOR, BorderLayout.NORTH);
-		frame.add(Componentes.PANEL_INFERIOR, BorderLayout.CENTER);
+        // Inicializar componentes
+        FRAME
+            .add (Componentes.PANEL_SUPERIOR, BorderLayout.NORTH);
+        FRAME
+            .add (Componentes.PANEL_INFERIOR, BorderLayout.CENTER);
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.pack();
-		frame.setVisible(true);
-	}
+        FRAME
+            .setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+        FRAME
+            .setResizable (false);
+        FRAME
+            .setSize (FRAME_ANCHO, FRAME_ALTO);
+        FRAME
+            .setVisible (true);
+    }
 }
