@@ -1,8 +1,8 @@
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.EnumMap;
+// import java.util.ArrayList;
+// import java.util.EnumMap;
 
 public class Componentes {
     private static final boolean DEBUGGING = true;

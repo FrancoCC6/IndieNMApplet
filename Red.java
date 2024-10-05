@@ -5,7 +5,7 @@ import javax.swing.*;
 public class Red {
     public final String SSID;
     //private final String PASSKEY;
-    //private JButton 
+    //private JButton
 
     public Red(String ssid) {
         this.SSID = ssid;
