@@ -3,15 +3,15 @@ import java.awt.*;
 import javax.swing.*;
 
 public class GUI {
-    private static final JFrame FRAME;
     private static final LayoutManager FRAME_LAYOUT = new BorderLayout();
     private static final String TITLE = "Conectarse a una red";
     public static final int
         FRAME_ANCHO = 300,
         FRAME_ALTO = 200;
 
+    private static final JFrame FRAME = new JFrame(TITLE);
+
     public static void createFrame() {
-        FRAME = new JFrame(TITLE);
         FRAME
             .setLayout (FRAME_LAYOUT);
 

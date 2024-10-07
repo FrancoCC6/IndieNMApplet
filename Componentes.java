@@ -6,25 +6,43 @@ import javax.swing.*;
 
 public class Componentes {
     private static final boolean DEBUGGING = true;
-    // Panel Superior
 
-    public static final JPanel PANEL_SUPERIOR; // Wrapper para botonera general
-
-    // Layout
+    // Paneles principales y layouts
     private static final LayoutManager P_SUP__LAYOUT = new FlowLayout();
+    public static final JPanel PANEL_SUPERIOR = new JPanel(P_SUP__LAYOUT);
+
+    private static final LayoutManager P_INF__LAYOUT = new CardLayout();
+    public static final JPanel PANEL_INFERIOR = new JPanel(P_INF__LAYOUT);
+
+    // Constantes para cardlayout
+    // TODO: Considerar usar estos valores para maps
+    private static final String
+        STR_MENUPRINCIPAL = "MENU_PRINCIPAL",
+        STR_REDCONOCIDA   = "RED_CONOCIDA",
+        STR_REDNUEVA      = "RED_NUEVA",
+        STR_SPLASH        = "SPLASH_SCREEN";
+
+    // Panel Superior - Wrapper para botonera general
 
     // Subcomponentes
     private static JButton
         p_sup__boton_menu_principal,
         p_sup__boton_reiniciar_wifi;
 
+    // Listeners
+    private static ActionListener
+        p_sup__listener_menu_principal = e -> {
+            // TODO: Cambiar esto por una rutina de buscar redes, algo asi:
+            // ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_SPLASH);
+            // lista_redes.buscarRedes();
+            // ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_MENUPRINCIPAL);
+            ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_MENUPRINCIPAL);
+        },
+        p_sup__listener_reiniciar_wifi = e -> {
+            // TODO: Reiniciar wifi, comunicarse con shellcommands
+        };
 
-    // Panel Inferior
-
-    public static final JPanel PANEL_INFERIOR; // Wrapper para menus particulares
-
-    // Layout
-    private static final LayoutManager P_INF__LAYOUT = new CardLayout();
+    // Panel Inferior - Wrapper para menus particulares
 
     // Subcomponentes
     private static JPanel
@@ -49,20 +67,30 @@ public class Componentes {
     //private static ListModel<Red> lista_redes = new AbstractListModel<Red>() {
     private static ListModel<String> lista_redes = new AbstractListModel<String>() {
         @Override
-        public int getSize() { return 1; }
+        public int getSize() {
+            return 1;
+        }
         @Override
         //public Red getElementAt(int index) { return null; }
-        public String getElementAt(int index) { return "Test"; }
+        public String getElementAt(int index) {
+            return "Test";
+        }
+
+        public void buscarRedes() {
+
+        }
     };
         // TODO: Estos son datos de prueba, cambiarlos
         // TODO: Instanciar en cada query, y luego cargar el panel de redes conocidas
     //private static JList<Red> p_inf__redc_lista_redes = new JList<Red>(lista_redes);
     private static JList<String> p_inf__redc_lista_redes = new JList<String>(lista_redes);
 
+    // Listeners
     private static ActionListener
         p_inf__menu_listener_conectar_red_conocida = e -> {
-            System.out.println("Puto el");
+            // System.out.println("Puto el");
                 // TODO: Transicion a menu de red conocida
+            ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_REDCONOCIDA);
         },
         p_inf__menu_listener_conectar_red_nueva = e -> {
             System.out.println("que lee");
@@ -194,10 +222,6 @@ public class Componentes {
 
     // Inicializador
     static {
-        // TODO: Construir componentes
-        PANEL_SUPERIOR = new JPanel(P_SUP__LAYOUT);
-        PANEL_INFERIOR = new JPanel(P_INF__LAYOUT);
-
         // Construir panel superior
 
         // Inicializando subcomponentes
@@ -206,18 +230,22 @@ public class Componentes {
         p_sup__boton_menu_principal = new JButton("Menu principal");
 
         // Handlers
-        // TODO: Hacer handlers
+        p_sup__boton_menu_principal
+            .addActionListener(p_sup__listener_menu_principal);
 
-        PANEL_SUPERIOR.add(p_sup__boton_menu_principal);
+        PANEL_SUPERIOR
+            .add(p_sup__boton_menu_principal);
 
         // Boton reiniciar WiFi
 
         p_sup__boton_reiniciar_wifi = new JButton("Reiniciar WiFi");
 
         // Handlers
-        // TODO: Hacer handlers
+        p_sup__boton_reiniciar_wifi
+            .addActionListener(p_sup__listener_reiniciar_wifi);
 
-        PANEL_SUPERIOR.add(p_sup__boton_reiniciar_wifi);
+        PANEL_SUPERIOR
+            .add(p_sup__boton_reiniciar_wifi);
 
         // Construir panel inferior
 
@@ -226,6 +254,16 @@ public class Componentes {
         p_inf__inicializarPanelRedConocida();
         p_inf__inicializarPanelRedNueva();
         p_inf__inicializarPanelSplashScreen();
+
+        // Agregando componentes al panel
+        PANEL_INFERIOR
+            .add(p_inf__panel_menuprincipal, STR_MENUPRINCIPAL);
+        PANEL_INFERIOR
+            .add(p_inf__panel_red_conocida, STR_REDCONOCIDA);
+        PANEL_INFERIOR
+            .add(p_inf__panel_red_nueva, STR_REDNUEVA);
+        PANEL_INFERIOR
+            .add(p_inf__panel_splashscreen, STR_SPLASH);
     }
 
     private static void queryRedesConocidas() {
