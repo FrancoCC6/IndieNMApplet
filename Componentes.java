@@ -37,6 +37,9 @@ public class Componentes {
             // lista_redes.buscarRedes();
             // ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_MENUPRINCIPAL);
             ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_MENUPRINCIPAL);
+
+	    // Reiniciar campos de red nueva
+	    // p_inf__red_nueva_input_ssid.set
         },
         p_sup__listener_reiniciar_wifi = e -> {
             // TODO: Reiniciar wifi, comunicarse con shellcommands
@@ -51,9 +54,8 @@ public class Componentes {
         p_inf__panel_red_nueva,      // Conectarse a una red nueva y registrarla
         p_inf__panel_splashscreen;   // Pantalla para tiempos de carga
 
-    private static JTextField
-        p_inf__red_nueva_input_ssid,
-        p_inf__red_nueva_input_psk;
+    private static JTextField p_inf__red_nueva_input_ssid;
+    private static JPasswordField p_inf__red_nueva_input_psk;
 
     private static JButton
         p_inf__red_nueva_boton_conectar;
@@ -88,13 +90,11 @@ public class Componentes {
     // Listeners
     private static ActionListener
         p_inf__menu_listener_conectar_red_conocida = e -> {
-            // System.out.println("Puto el");
-                // TODO: Transicion a menu de red conocida
+		// TODO: Transicion a menu de red conocida
             ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_REDCONOCIDA);
         },
         p_inf__menu_listener_conectar_red_nueva = e -> {
-            System.out.println("que lee");
-                // TODO: Transicion a menu de red nueva
+            ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_REDNUEVA);
         },
 
         p_inf__redn_listener_conectar = e -> {
@@ -140,7 +140,7 @@ public class Componentes {
         GridBagConstraints gbc = new GridBagConstraints();
 
         p_inf__red_nueva_input_ssid = new JTextField();
-        p_inf__red_nueva_input_psk = new JTextField();
+        p_inf__red_nueva_input_psk = new JPasswordField();
             // TODO: Ocultar input
         p_inf__red_nueva_boton_conectar = new JButton("Conectar");
 
