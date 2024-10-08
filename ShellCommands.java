@@ -116,7 +116,7 @@ public enum ShellCommands {
         return new String[] {
             "/bin/bash",
             "-c",
-            "echo " + pword_usuario + " | sudo " + comando
+            "echo " + pword_usuario + " | sudo -S " + comando
         };
     }
 
@@ -126,37 +126,41 @@ public enum ShellCommands {
             return;
         }
 
-        Process proceso_universal;
+        try {
+            Process proceso_universal;
+			int status;
+			String[] comandos = new String[] {
+				// 1. Matar wpa_supplicant
+				"pkill wpa_supplicant",
 
-        // 1. Matar wpa_supplicant
-        proceso_universal = Runtime.getRuntime()
-            .exec(getComandoSudo("pkill wpa_supplicant"));
+				// 2. Matar dhclient
+				"pkill dhclient",
 
-        // 2. Matar dhclient
-        proceso_universal = Runtime.getRuntime()
-            .exec(getComandoSudo("pkill dhclient"));
+				// 3. Ejecutar wpa_supplicant
+				"wpa_supplicant -B -Dnl80211 -i" + interfaz_wifi + " -c" + ws_path,
 
-        // 3. Ejecutar wpa_supplicant
-        proceso_universal = Runtime.getRuntime()
-            .exec(getComandoSudo(
-                "wpa_supplicant \
-                -B \
-                -Dnl80211 \
-                -i" + interfaz_wifi + " \
-                -c" + ws_path
-            ));
+				// 4. Ejecutar dhclient
+				"dhclient"
+			};
 
-        // TODO: Considerar loguear las salidas, ahora es solo de prueba
-        // String linea;
-        // BufferedReader input = new BufferedReader(new InputStreamReader(proceso_universal.getInputStream()));
-        // while ((linea = input.readLine()) != null) {
-            // System.out.println(linea);
-        // }
+			for (String comando : comandos) {
+				proceso_universal = Runtime.getRuntime()
+					.exec(getComandoSudo(comando));
+				status = proceso_universal.waitFor();
+				// GUARDA: wpa_supplicant se demora demasiado poco
 
-        // input.close();
+				// TODO: Considerar loguear las salidas, ahora es solo de prueba
+				// String linea;
+				// BufferedReader input = new BufferedReader(new InputStreamReader(proceso_universal.getInputStream()));
+				// while ((linea = input.readLine()) != null) {
+					// System.out.println(linea);
+				// }
 
-        // 4. Ejecutar dhclient
-        proceso_universal = Runtime.getRuntime()
-            .exec(getComandoSudo("dhclient"));
+				// input.close();
+			}
+        }
+        catch (Exception e) {
+            System.err.println("Mierda");
+        }
     }
 }
