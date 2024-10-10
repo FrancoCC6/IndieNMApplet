@@ -1,7 +1,13 @@
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
-// import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.*;
+import java.util.regex.*;
+import java.io.File;
+// import javafx.util.Pair;
+import java.util.ArrayList;
 // import java.util.EnumMap;
 
 public class Componentes {
@@ -66,21 +72,66 @@ public class Componentes {
         p_inf__menu_boton_conectar_red_nueva = new JButton("Conectar red nueva");
         //p_inf__menu_boton_salir = new JButton("Salir");
 
+    //private static ListModel<Pair<String, String>> lista_redes = new AbstractListModel<Red>() {
     //private static ListModel<Red> lista_redes = new AbstractListModel<Red>() {
     private static ListModel<String> lista_redes = new AbstractListModel<String>() {
+		private ArrayList<String> redes__ssid = new ArrayList<String>();
+		private ArrayList<String> redes__path = new ArrayList<String>();
+
+		public void queryRedesConocidas() {
+			Scanner lector;
+			Pattern patron = Pattern.compile(".wpa_supplicant.conf.*");
+			List<File> directorio_wpa = Stream.of(
+				new File(Usuario.getDirectorioWPAConf()).listFiles())
+				.filter(
+					file -> !file.isDirectory()
+				&&	patron.matcher(file.getName()).find())
+				.collect(Collectors.toList());
+			try {
+				for (File archivo_wpa: directorio_wpa) {
+					String ssid;
+					lector = new Scanner(archivo_wpa);
+					while (lector.hasNextLine()) {
+						String linea = lector.nextLine();
+						if (!linea.contains("ssid=")) { // Guarda que capaz hay que castearlo a CharSequence
+							continue;
+						}
+
+						redes__ssid.add(
+							linea.substring(
+								linea.indexOf("\"") + 1, 
+								linea.lastIndexOf("\"")
+							)
+						);
+						redes__path.add(archivo_wpa.getName());
+
+						break;
+					}
+				}
+
+				if (redes__path.size() != redes__ssid.size()) {
+					throw new Exception();
+				}
+			}
+			catch (Exception e) {
+				System.err.println("Error buscando las redes conocidas");
+			}
+		}
+
         @Override
         public int getSize() {
-            return 1;
+            return redes__ssid.size();
         }
+
         @Override
         //public Red getElementAt(int index) { return null; }
         public String getElementAt(int index) {
-            return "Test";
+            return redes__ssid.get(index);
         }
 
-        public void buscarRedes() {
-
-        }
+		public String getPathOf(int index) {
+            return redes__path.get(index);
+		}
     };
         // TODO: Estos son datos de prueba, cambiarlos
         // TODO: Instanciar en cada query, y luego cargar el panel de redes conocidas
@@ -222,6 +273,11 @@ public class Componentes {
 
     // Inicializador
     static {
+        // Buscar redes, por si acaso aca lo pongo primero
+        // TODO: Buscar mejor manera de conectar a las redes
+		lista_redes.setSelectionMode(ListSelectionModel.SINGLE_SELECT);
+        lista_redes.queryRedesConocidas();
+
         // Construir panel superior
 
         // Inicializando subcomponentes
@@ -266,36 +322,11 @@ public class Componentes {
             .add(p_inf__panel_splashscreen, STR_SPLASH);
     }
 
-    private static void queryRedesConocidas() {
-
+	/*
+    private static AbstractListModel<Pair<String, String> queryRedesConocidas() {
+		AbstractListModel<Pair<String, String> 
     }
-
-  /*
-	private static void main(String[] args) {
-      if (args.length != 1) {
-          return 1;
-      }
-
-
-
-      switch (args[0]) {
-      case "MENU_PRINCIPAL":
-          // TODO: Handle debug
-          break;
-      case "RED_CONOCIDA":
-          // TODO: Handle debug
-          break;
-      case "RED_NUEVA":
-          // TODO: Handle debug
-          break;
-      case "SPLASH_SCREEN":
-          // TODO: Handle debug
-          break;
-      default:
-          return 1;
-      }
-	}
-  */
+	*/
 
     public static void main(String [] args) {
         if (!DEBUGGING || args.length != 1) {

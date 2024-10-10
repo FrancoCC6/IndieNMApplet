@@ -28,6 +28,8 @@ public class GUI {
         FRAME
             .setSize (FRAME_ANCHO, FRAME_ALTO);
         FRAME
+            .setLocationRelativeTo (null);
+        FRAME
             .setVisible (true);
     }
 }
