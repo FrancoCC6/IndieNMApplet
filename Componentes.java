@@ -74,64 +74,69 @@ public class Componentes {
 
     //private static ListModel<Pair<String, String>> lista_redes = new AbstractListModel<Red>() {
     //private static ListModel<Red> lista_redes = new AbstractListModel<Red>() {
+
+    private static ArrayList<String> redes__ssid = new ArrayList<String>();
+    private static ArrayList<String> redes__path = new ArrayList<String>();
+
+    private static void queryRedesConocidas() {
+        // Reiniciar listas
+        redes__path = new ArrayList<String>();
+        redes__ssid = new ArrayList<String>();
+
+        Scanner lector;
+        Pattern patron = Pattern.compile(".wpa_supplicant.conf.*");
+        List<File> directorio_wpa = Stream.of(
+            new File(Usuario.getDirectorioWPAConf()).listFiles())
+            .filter(
+            file -> !file.isDirectory()
+            &&	patron.matcher(file.getName()).find())
+            .collect(Collectors.toList());
+        try {
+            for (File archivo_wpa: directorio_wpa) {
+                System.err.println(archivo_wpa.getName());
+                String ssid;
+                lector = new Scanner(archivo_wpa);
+                while (lector.hasNextLine()) {
+                    String linea = lector.nextLine();
+                    if (!linea.contains("ssid=")) { // Guarda que capaz hay que castearlo a CharSequence
+                    continue;
+                    }
+
+                    redes__ssid.add(
+                        linea.substring(
+                            linea.indexOf("\"") + 1,
+                            linea.lastIndexOf("\"")
+                        )
+                    );
+                    redes__path.add(archivo_wpa.getName());
+
+                    break;
+                }
+            }
+
+            if (redes__path.size() != redes__ssid.size()) {
+            throw new Exception();
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error buscando las redes conocidas");
+        }
+    }
+
     private static ListModel<String> lista_redes = new AbstractListModel<String>() {
-		private ArrayList<String> redes__ssid = new ArrayList<String>();
-		private ArrayList<String> redes__path = new ArrayList<String>();
+            @Override
+            public int getSize() {
+                return redes__ssid.size();
+            }
 
-		public void queryRedesConocidas() {
-			Scanner lector;
-			Pattern patron = Pattern.compile(".wpa_supplicant.conf.*");
-			List<File> directorio_wpa = Stream.of(
-				new File(Usuario.getDirectorioWPAConf()).listFiles())
-				.filter(
-					file -> !file.isDirectory()
-				&&	patron.matcher(file.getName()).find())
-				.collect(Collectors.toList());
-			try {
-				for (File archivo_wpa: directorio_wpa) {
-					String ssid;
-					lector = new Scanner(archivo_wpa);
-					while (lector.hasNextLine()) {
-						String linea = lector.nextLine();
-						if (!linea.contains("ssid=")) { // Guarda que capaz hay que castearlo a CharSequence
-							continue;
-						}
+            @Override
+            public String getElementAt(int index) {
+                return redes__ssid.get(index);
+            }
 
-						redes__ssid.add(
-							linea.substring(
-								linea.indexOf("\"") + 1, 
-								linea.lastIndexOf("\"")
-							)
-						);
-						redes__path.add(archivo_wpa.getName());
-
-						break;
-					}
-				}
-
-				if (redes__path.size() != redes__ssid.size()) {
-					throw new Exception();
-				}
-			}
-			catch (Exception e) {
-				System.err.println("Error buscando las redes conocidas");
-			}
-		}
-
-        @Override
-        public int getSize() {
-            return redes__ssid.size();
+        public String getPathOf(int index) {
+                return redes__path.get(index);
         }
-
-        @Override
-        //public Red getElementAt(int index) { return null; }
-        public String getElementAt(int index) {
-            return redes__ssid.get(index);
-        }
-
-		public String getPathOf(int index) {
-            return redes__path.get(index);
-		}
     };
         // TODO: Estos son datos de prueba, cambiarlos
         // TODO: Instanciar en cada query, y luego cargar el panel de redes conocidas
@@ -275,8 +280,8 @@ public class Componentes {
     static {
         // Buscar redes, por si acaso aca lo pongo primero
         // TODO: Buscar mejor manera de conectar a las redes
-		lista_redes.setSelectionMode(ListSelectionModel.SINGLE_SELECT);
-        lista_redes.queryRedesConocidas();
+        // lista_redes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        queryRedesConocidas();
 
         // Construir panel superior
 
