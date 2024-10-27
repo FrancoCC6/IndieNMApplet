@@ -99,7 +99,7 @@ public class Componentes {
                 while (lector.hasNextLine()) {
                     String linea = lector.nextLine();
                     if (!linea.contains("ssid=")) { // Guarda que capaz hay que castearlo a CharSequence
-                    continue;
+                        continue;
                     }
 
                     redes__ssid.add(
@@ -115,7 +115,7 @@ public class Componentes {
             }
 
             if (redes__path.size() != redes__ssid.size()) {
-            throw new Exception();
+                throw new Exception();
             }
         }
         catch (Exception e) {
@@ -146,7 +146,7 @@ public class Componentes {
     // Listeners
     private static ActionListener
         p_inf__menu_listener_conectar_red_conocida = e -> {
-		// TODO: Transicion a menu de red conocida
+            // TODO: Transicion a menu de red conocida
             ((CardLayout)P_INF__LAYOUT).show(PANEL_INFERIOR, STR_REDCONOCIDA);
         },
         p_inf__menu_listener_conectar_red_nueva = e -> {
@@ -154,8 +154,49 @@ public class Componentes {
         },
 
         p_inf__redn_listener_conectar = e -> {
-            return;
-                // TODO: Rutina de conexion a red nueva
+            // TODO: Considerar escaneo
+
+            String password = p_inf__red_nueva_input_psk.getText();
+
+            if (
+                password.length() < 8
+            ||  password.indexOf(" ") >= 0
+            ) {
+                // TODO: Mostrar mensaje de error detallado en GUI
+                System.err.println("Contraseña invalida");
+                return;
+            }
+
+            String
+                wpa_conf_filename =
+                    ".wpa_supplicant.conf."
+                    +   p_inf__red_nueva_input_ssid
+                    .getText()
+                    .toLowerCase()
+                    .replaceAll(" ", "_"),
+                pass_file_create_command = String.format(
+                    "wpa_passphrase \"%s\" %s >> %s/%s",
+                    p_inf__red_nueva_input_ssid.getText(),
+                    password,
+                    Usuario.getDirectorioWPAConf(),
+                    wpa_conf_filename
+                );
+
+            try {
+                int status;
+                Process filemaking_process = Runtime.getRuntime()
+                    .exec(new String[] {
+                        "/bin/bash",
+                        "-c",
+                        pass_file_create_command
+                    });
+                status = filemaking_process.waitFor();
+                // TODO: Esto es para depuracion, borrarlo
+                System.out.println("Terminado");
+            }
+            catch (Exception exc) {
+                System.err.println("Fallo al crear vinculo a red nueva");
+            }
         };
 
     // Layouts componentes panel inferior
@@ -186,8 +227,6 @@ public class Componentes {
 
         p_inf__panel_red_conocida
             .add (p_inf__redc_lista_redes, BorderLayout.CENTER);
-
-        // Red.cargarRedes();
     }
 
     private static void p_inf__inicializarPanelRedNueva() {
@@ -205,10 +244,10 @@ public class Componentes {
 
         // Las etiquetas las voy a crear aparte, porque se me cantan los huevos
 
+        // TODO: Apartar configuraciones de GridBagConstraints
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.weightx = 0;
-            //gbc.anchor = GridBagConstraints.LINE_START;
         p_inf__panel_red_nueva
             .add (new JLabel("Nombre de la red"), gbc);
 
@@ -221,7 +260,6 @@ public class Componentes {
             gbc.gridx = 0;
             gbc.gridy = 1;
             gbc.weightx = 0;
-            //gbc.fill = GridBagConstraints.NONE;
         p_inf__panel_red_nueva
                 .add (new JLabel("Contraseña"), gbc);
 
